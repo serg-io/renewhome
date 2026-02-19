@@ -1,0 +1,116 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "alembic: upgrade",
+            "type": "shell",
+            "command": "alembic",
+            "options": {
+                "cwd": "${workspaceFolder}/backend",
+            },
+            "args": [
+                "upgrade",
+                "heads",
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "alembic: downgrade",
+            "type": "shell",
+            "command": "alembic",
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "args": [
+                "downgrade",
+                "-${input:alembicDowngradeDistance}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "alembic: upgrade test DB",
+            "type": "shell",
+            "command": "alembic",
+            "options": {
+                "cwd": "${workspaceFolder}/backend",
+                "env": {
+                    "FLASK_ENV": "test"
+                },
+            },
+            "args": [
+                "upgrade",
+                "heads",
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "alembic: downgrade test DB",
+            "type": "shell",
+            "command": "alembic",
+            "options": {
+                "cwd": "${workspaceFolder}/backend",
+                "env": {
+                    "FLASK_ENV": "test"
+                }
+            },
+            "args": [
+                "downgrade",
+                "-${input:alembicDowngradeDistance}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "npm: install",
+            "type": "shell",
+            "command": "npm install",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "npm: start",
+            "type": "npm",
+            "script": "start",
+            "path": "frontend/",
+            "isBackground": true,
+            "options": {
+                "env": {
+                    "BROWSER": "none"
+                }
+            },
+            "problemMatcher": {
+                "owner": "vscode",
+                "pattern": {
+                    "regexp": ".*"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^Starting.*$",
+                    "endsPattern": "^Compiled.*$"
+                }
+            },
+            "dependsOn": [
+                "npm: install"
+            ]
+        },
+        {
+            "label": "npm: stop",
+            "type": "shell",
+            "command": "killall",
+            "args": [
+                "npm run start"
+            ],
+            "problemMatcher": []
+        },
+    ],
+    "inputs": [
+        {
+            "id": "alembicDowngradeDistance",
+            "type": "promptString",
+            // type specific configuration attributes
+            "default": "1",
+            "description": "how far to downgrade",
+        }
+    ]
+}

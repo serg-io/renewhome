@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      cache_from:
+        - ghcr.io/ohmconnect/full-stack-assessment-devcontainer
+      args:
+        # Update 'VARIANT' to pick a version of Python: 3, 3.10, 3.9, 3.8, 3.7, 3.6
+        # Append -bullseye or -buster to pin to an OS version.
+        # Use -bullseye variants on local arm64/Apple Silicon.
+        VARIANT: '3.8'
+        # Optional Node.js version to install
+        NODE_VERSION: 'lts/*'
+
+    environment:
+      # makes mysql cli client work without args
+      - MYSQL_HOST=db
+      - FLASK_ENV=development
+
+    volumes:
+      - ..:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    network_mode: service:db
+    # Uncomment the next line to use a non-root user for all processes.
+    user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    image: public.ecr.aws/bitnami/mysql:8.0.27
+    restart: unless-stopped
+    volumes:
+      - ./config/mysql/my.cnf:/etc/my.cnf
+      - ./config/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    environment:
+      ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: 'test'
+      MYSQL_DATABASE: 'abc'
+      MYSQL_AUTHENTICATION_PLUGIN: 'mysql_native_password'
+      TZ: 'UTC'
+
+    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+volumes:
+  mysql_data: null

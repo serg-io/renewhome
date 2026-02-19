@@ -1,0 +1,20 @@
+name: 'Duplicate Assessment Repo'
+description: 'Duplicate the assessment repo and set it up for new applicant'
+inputs:
+  applicant_full_name:
+    description: 'Full name of the Applicant'
+    required: true
+  applicant_github_username:
+    description: 'Github user name of the Applicant (omit to skip inviting them)'
+    required: false
+  token:
+    description: 'Github token to use'
+    required: true
+
+outputs:
+  repository: # id of output
+    description: 'the newly created repository identifier'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

@@ -1,0 +1,154 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.209.6/containers/python-3-postgres
+// Update the VARIANT arg in docker-compose.yml to pick a Python version
+{
+  "name": "Hoagie Helper - Renew Home Engineering Assessment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "sqltools.connections": [
+      {
+        "mysqlOptions": {
+          "authProtocol": "default"
+        },
+        "previewLimit": 50,
+        "server": "db",
+        "port": 3306,
+        "driver": "MySQL",
+        "name": "DB",
+        "database": "hoagie_helper",
+        "username": "vscode",
+        "password": ""
+      },
+      {
+        "mysqlOptions": {
+          "authProtocol": "default"
+        },
+        "previewLimit": 50,
+        "server": "db",
+        "port": 3306,
+        "driver": "MySQL",
+        "name": "DB",
+        "database": "hoagie_helper_test",
+        "username": "vscode",
+        "password": ""
+      }
+    ],
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "python.pythonPath": "/usr/local/bin/python",
+    "python.envFile": "${workspaceFolder}/.devcontainer/.env",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false, //python linting is not responding to config files?
+    "python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
+    "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
+    "python.formatting.yapfPath": "/usr/local/py-utils/bin/yapf",
+    "python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
+    "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
+    "python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
+    "python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
+    "python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
+    "python.testing.pytestPath": "/usr/local/bin/pytest",
+    "python.linting.pylintPath": "/usr/local/bin/pylint",
+    "python.linting.pylintArgs": [
+      "--load-plugins",
+      "pylint_flask_sqlalchemy",
+      "--rcfile",
+      "${workspaceFolder}/.pylintrc"
+    ],
+    "python.testing.cwd": "${workspaceFolder}/backend",
+    "python.testing.debugPort": 67676,
+    "python.testing.pytestEnabled": true,
+    "python.testing.promptToConfigure": false,
+    "jest.rootPath": "frontend",
+    "editor.detectIndentation": true,
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[python]": {
+      "editor.wordBasedSuggestions": false,
+      "editor.formatOnSaveMode": "modifications",
+      "editor.defaultFormatter": "ms-python.python",
+      "editor.detectIndentation": false
+    },
+    "[json]": {
+      "editor.quickSuggestions": {
+        "strings": true
+      },
+      "editor.suggest.insertMode": "replace",
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+      "editor.quickSuggestions": {
+        "strings": true
+      },
+      "editor.suggest.insertMode": "replace",
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[html]": {
+      "editor.suggest.insertMode": "replace",
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "eslint.workingDirectories": [
+      "frontend",
+    ],
+    "python.testing.unittestArgs": [
+      "-v",
+      "-s",
+      ".",
+      "--cov",
+      "--cov-report html",
+      "-p",
+      "*test*.py"
+    ],
+    "prettier.configPath": "frontend/.prettierrc",
+    "prettier.documentSelectors": [
+      "*.js",
+      "*.ts",
+      "*.tsx",
+      "*.jsx",
+      ".json"
+    ],
+    "prettier.bracketSpacing": false
+  },
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-mysql",
+    "redhat.vscode-yaml",
+    "dbaeumer.vscode-eslint",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "mgmcdermott.vscode-language-babel",
+    "styled-components.vscode-styled-components",
+    "esbenp.prettier-vscode",
+    "orta.vscode-jest"
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    3000,
+    3306
+  ],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "pip install --user -r requirements.txt",
+  "postAttachCommand": "bash ./.devcontainer/tools/post_attach.sh",
+  // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "vscode",
+  "hostRequirements": {
+    "memory": "8gb"
+  }
+}

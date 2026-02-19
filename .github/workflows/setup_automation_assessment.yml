@@ -1,0 +1,87 @@
+name: 'Setup Automation and Test Assessment'
+env:
+  # The owner of this token will appear as the owner of the new repo and issues
+  # Create your own token by following the instructions here:
+  # https://www.notion.so/renewhome/Hoagie-Haven-Engineering-Assessments-263511f0a9b041e786eca9b518544bcf#1a1c0fea3ea280b8b3b1f803b301d03f
+  GITHUB_TOKEN: ${{ secrets.BJ_WORKFLOW_PAT }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      applicant_full_name:
+        description: 'Full name of the applicant, used to generate the repo name'
+        required: true
+        type: string
+      applicant_github_username:
+        description: 'Github user name of the applicant (omit to skip inviting them to the new repo)'
+        required: false
+        type: string
+
+jobs:
+  create_repo:
+    name: Create Repo
+    runs-on: ubuntu-latest
+    outputs:
+      repo: ${{steps.new_repo.outputs.repo}}
+    steps:
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
+
+      # gotta check out the repo before using the custom actions
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+
+      - name: Create Repo
+        id: new_repo
+        uses: ./.github/actions/duplicate_repo_action
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          applicant_full_name: ${{ github.event.inputs.applicant_full_name }}
+          applicant_github_username: ${{ github.event.inputs.applicant_github_username }}
+
+  create_issues:
+    name: Create Issues
+    runs-on: ubuntu-latest
+    needs: create_repo
+    env:
+      REPO: ${{ needs.create_repo.outputs.repo }}
+      
+    steps:
+      # gotta check out the repo before using the custom actions
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+
+      # if the username is not provided, this will not run
+      - name: Setup assignee
+        run: echo "ASSIGNEE=--assignee ${{ github.event.inputs.applicant_github_username }}" >> $GITHUB_ENV
+        if: ${{ github.event.inputs.applicant_github_username }}  
+
+      # issues are listed in a weird order so that they sort top to bottom as desired in the issues page
+
+      - name: Create functional testing issue
+        run: gh issue create --body-file $BODY_FILE --label "$LABEL" --title "$TITLE" --repo $REPO
+        env:
+          TITLE: Demo functional Hoagie Haven testing
+          BODY_FILE: .github/assessment_issues/1034_functional_testing.md
+          LABEL: enhancement
+
+      - name: Create order coverage issue
+        run: gh issue create --body-file $BODY_FILE --label "$LABEL" --title "$TITLE" --repo $REPO
+        env:
+          TITLE: Order API coverage is low
+          BODY_FILE: .github/assessment_issues/1033_order_api_coverage.md
+          LABEL: enhancement
+
+      - name: Create backend bug issue
+        run: gh issue create --body-file $BODY_FILE --label "$LABEL" --title "$TITLE" --repo $REPO
+        env:
+          TITLE: Updating order sandwich quantity gives mulitples of the same sandwich
+          BODY_FILE: .github/assessment_issues/1021_backend_bug.md
+          LABEL: bug
+
+      - name: Create find the bug issue
+        run: gh issue create --body-file $BODY_FILE --label "$LABEL" --title "$TITLE" --repo $REPO
+        env:
+          TITLE: Missing requirements
+          BODY_FILE: .github/assessment_issues/1026_find_the_bug.md
+          LABEL: good first issue
