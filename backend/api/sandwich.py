@@ -27,7 +27,7 @@ def get_sandwiches():
         name=s.name,
         description=s.description,
         price=s.price,
-        image_url='TODO'
+        image_url=s.image_url()
     ) for s in all_sandwiches]
 
     return jsonify(api_sandwiches)
