@@ -176,6 +176,10 @@ def create_partner_order():
     if 'items' not in payload or len(payload.get('items')) == 0:
         return 'Invalid request payload: The order payload does not contain any items.', 400
 
+    for item in payload.get('items'):
+        if item.get('quantity') < 1:
+            return 'Invalid request: Quantity must be a positive integer.', 400
+
     order = Order()
     db.session.add(order)
     db.session.commit()
