@@ -156,3 +156,13 @@ class OrderApiTest(HoagieTester):
             assert added_order.items[0].quantity == 2
             assert added_order.items[0].sandwich_id == 1
             assert added_order.status == Order.Status.SUBMITTED
+
+    def test_create_partner_order_without_items(self):
+        with app.test_client() as client:
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({}), content_type='application/json')
+            assert result.status_code == 400
+
+    def test_create_partner_order_with_zero_items(self):
+        with app.test_client() as client:
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({ 'items': [] }), content_type='application/json')
+            assert result.status_code == 400

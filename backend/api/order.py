@@ -171,6 +171,11 @@ def create_partner_order():
     }
     """
 
+    payload = request.json
+
+    if 'items' not in payload or len(payload.get('items')) == 0:
+        return 'Invalid request payload: The order payload does not contain any items.', 400
+
     order = Order()
     db.session.add(order)
     db.session.commit()
