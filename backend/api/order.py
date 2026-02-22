@@ -13,6 +13,7 @@ import phonenumbers
 from flask_common import app, db
 from models import Order
 from _helpers import safe_int
+from .partner import authenticate_partner_request
 
 
 @dataclass
@@ -170,6 +171,18 @@ def create_partner_order():
         phone_number?: str
     }
     """
+
+    if not authenticate_partner_request(request):
+        return 'Unauthorized request.', 401
+
+    payload = request.json
+
+    if 'items' not in payload or len(payload.get('items')) == 0:
+        return 'Invalid request payload: The order payload does not contain any items.', 400
+
+    for item in payload.get('items'):
+        if item.get('quantity') < 1:
+            return 'Invalid request: Quantity must be a positive integer.', 400
 
     order = Order()
     db.session.add(order)
