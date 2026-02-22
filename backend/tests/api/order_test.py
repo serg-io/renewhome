@@ -2,7 +2,7 @@
 from curses import nonl
 from enum import Enum
 import json
-
+from flask.testing import FlaskClient
 from dacite import Config, from_dict
 
 
@@ -10,6 +10,7 @@ from api.order import BASE_ORDER_ROUTE, BASE_PARTNER_ORDER_ROUTE, ApiOrder, ApiO
 from app_main import db, app
 from models import Order
 from tests import HoagieTester
+from .partner_session_test import request_access_token
 
 
 class OrderApiTest(HoagieTester):
@@ -114,7 +115,7 @@ class OrderApiTest(HoagieTester):
             assert order.items[0].sandwich_id == item_input.sandwich_id
             assert order.items[0].quantity == item_input.quantity
 
-    def test_create_partner_order_without_phone_number(self):
+    def test_missing_partner_authorization(self):
         with app.test_client() as client:
             item_input = ApiOrderItemInput(
                 quantity=2,
@@ -123,6 +124,32 @@ class OrderApiTest(HoagieTester):
             result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({
                 'items': [item_input.__dict__],
             }), content_type='application/json')
+
+            assert result.status_code == 401
+
+    def test_invalid_partner_authorization(self):
+        with app.test_client() as client:
+            item_input = ApiOrderItemInput(
+                quantity=2,
+                sandwich_id=1
+            )
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({
+                'items': [item_input.__dict__],
+            }), content_type='application/json', headers={ 'Authorization': 'Bearer invalid_access_token'})
+
+            assert result.status_code == 401
+
+    def test_create_partner_order_without_phone_number(self):
+        with app.test_client() as client:
+            token_result = request_access_token(client)
+            access_token = token_result.json.get('access_token')
+            item_input = ApiOrderItemInput(
+                quantity=2,
+                sandwich_id=1
+            )
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({
+                'items': [item_input.__dict__],
+            }), content_type='application/json', headers={ 'Authorization': f'Bearer {access_token}'})
             assert result.status_code == 200
             payload = result.json
             assert payload is not None
@@ -137,6 +164,8 @@ class OrderApiTest(HoagieTester):
 
     def test_create_partner_order_with_phone_number(self):
         with app.test_client() as client:
+            token_result = request_access_token(client)
+            access_token = token_result.json.get('access_token')
             item_input = ApiOrderItemInput(
                 quantity=2,
                 sandwich_id=1
@@ -144,7 +173,7 @@ class OrderApiTest(HoagieTester):
             result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({
                 'items': [item_input.__dict__],
                 'phone_number': '+1 858 456 7890'
-            }), content_type='application/json')
+            }), content_type='application/json', headers={ 'Authorization': f'Bearer {access_token}'})
             assert result.status_code == 200
             payload = result.json
             assert payload is not None
@@ -159,21 +188,27 @@ class OrderApiTest(HoagieTester):
 
     def test_create_partner_order_without_items(self):
         with app.test_client() as client:
-            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({}), content_type='application/json')
+            token_result = request_access_token(client)
+            access_token = token_result.json.get('access_token')
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({}), content_type='application/json', headers={ 'Authorization': f'Bearer {access_token}'})
             assert result.status_code == 400
 
     def test_create_partner_order_with_empty_items(self):
         with app.test_client() as client:
-            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({ 'items': [] }), content_type='application/json')
+            token_result = request_access_token(client)
+            access_token = token_result.json.get('access_token')
+            result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({ 'items': [] }), content_type='application/json', headers={ 'Authorization': f'Bearer {access_token}'})
             assert result.status_code == 400
 
     def test_create_partner_order_with_quantity_zero(self):
         with app.test_client() as client:
+            token_result = request_access_token(client)
+            access_token = token_result.json.get('access_token')
             item_input = ApiOrderItemInput(
                 quantity=0,
                 sandwich_id=1
             )
             result = client.post(f'{BASE_PARTNER_ORDER_ROUTE}/create', data=json.dumps({
                 'items': [item_input.__dict__]
-            }), content_type='application/json')
+            }), content_type='application/json', headers={ 'Authorization': f'Bearer {access_token}'})
             assert result.status_code == 400
