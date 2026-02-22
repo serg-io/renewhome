@@ -15,3 +15,5 @@ class SandwichApiTest(HoagieTester):
             payload = result.json
             assert payload is not None
             assert len(payload) == 4
+            for item in payload:
+                assert item.get('image_url') == f"/static/{item.get('id')}.jpeg"
