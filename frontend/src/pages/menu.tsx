@@ -12,8 +12,17 @@ import {useUpdateOrder} from 'hooks/orderActions';
  */
 const SandwichGrid = styled.div`
   ${({theme}) => css`
+    --menu-columns: 1;
+
+    @media (width >= 700px) and (width < 1000px) {
+      --menu-columns: 2;
+    }
+    @media (width >= 1000px) {
+      --menu-columns: 3;
+    }
+
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--menu-columns), 1fr);
     grid-auto-rows: 1fr;
     gap: 10px;
   `}
