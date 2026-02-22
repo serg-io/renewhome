@@ -27,6 +27,10 @@ const StyledRowActions = styled.div`
   justify-content: end;
   display: flex;
   gap: 8px;
+
+  @media (width < 700px) {
+    flex-direction: column;
+  }
 `;
 
 /**

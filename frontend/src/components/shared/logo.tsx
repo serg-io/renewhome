@@ -20,6 +20,12 @@ const StyledLogo = styled.div`
     padding: 10px 0;
     color: ${theme.text.contrastColor};
     display: inline-block;
+
+    @media (width < 700px) {
+      h4 {
+        display: none;
+      }
+    }
   `}
 `;
 
@@ -33,6 +39,10 @@ const StyledLogoTitle = styled.h3`
     margin: 0;
     background: ${theme.color.contentBackground};
     color: ${theme.color.tertiary};
+
+    @media (width < 550px) {
+      font-size: 32px;
+    }
   `}
 `;
 

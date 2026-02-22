@@ -15,6 +15,12 @@ const StyledHeader = styled.div`
     padding: 5px;
     display: flex;
     flex-direction: row;
+
+    @media (width < 700px) {
+      #back-label {
+        display: none;
+      }
+    }
   `}
 `;
 
@@ -49,7 +55,11 @@ export function Header({backTo, ...props}: WithChildren<{backTo?: string}>): JSX
     <>
       <StyledHeader>
         <StyledFlexContainer>
-          {backTo ? <Button to={backTo}>{'< Back'}</Button> : null}
+          {backTo ? (
+            <Button to={backTo}>
+              &lt; <span id="back-label">Back</span>
+            </Button>
+          ) : null}
         </StyledFlexContainer>
         <Logo />
         <StyledFlexContainer justify="end">
